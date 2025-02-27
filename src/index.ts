@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
+import Logger from "./utils/logger"; // Import the logger
 
 /**
  * Options for initializing the MicrostreamClient.
@@ -13,6 +14,8 @@ export interface MicrostreamClientOptions {
   timeout?: number;
   /** Interval for sending heartbeats in milliseconds (default: 5000). */
   heartbeatInterval?: number;
+  /** Log level for the client (default: "info"). */
+  logLevel?: "debug" | "info" | "warn" | "error" | "silent";
 }
 
 /**
@@ -39,6 +42,7 @@ export class MicrostreamClient {
   private handlers: { [event: string]: (data: any) => any } = {};
   private pendingRequests: { [requestId: string]: (response: any) => void } =
     {};
+  private logger: Logger; // Add logger instance
 
   /**
    * Initializes a new MicrostreamClient.
@@ -49,15 +53,17 @@ export class MicrostreamClient {
     serviceName,
     timeout = 5000,
     heartbeatInterval = 5000,
+    logLevel = "info", // Add logLevel option
   }: MicrostreamClientOptions) {
     this.serviceName = serviceName;
     this.timeout = timeout;
     this.heartbeatInterval = heartbeatInterval;
+    this.logger = new Logger(logLevel); // Initialize logger
     this.socket = io(hubUrl, { query: { serviceName } });
 
     // Handle connection
     this.socket.on("connect", () => {
-      console.log(
+      this.logger.info(
         `[${this.serviceName}] Connected to Microstream Hub at ${hubUrl}`
       );
       this.startHeartbeat();
@@ -65,13 +71,15 @@ export class MicrostreamClient {
 
     // Handle disconnection
     this.socket.on("disconnect", () => {
-      console.log(`[${this.serviceName}] Disconnected from Microstream Hub`);
+      this.logger.warn(
+        `[${this.serviceName}] Disconnected from Microstream Hub`
+      );
       this.stopHeartbeat();
     });
 
     // Handle incoming requests
     this.socket.on("request", ({ id, event, data }) => {
-      console.log(
+      this.logger.debug(
         `[${this.serviceName}] Received request for event "${event}" (ID: ${id})`,
         data
       );
@@ -81,14 +89,14 @@ export class MicrostreamClient {
         try {
           // Execute the handler and get the response
           const response = this.handlers[event](data);
-          console.log(
+          this.logger.debug(
             `[${this.serviceName}] Sending response for event "${event}" (ID: ${id})`,
             response
           );
           // Send the response back to the requester
           this.socket.emit("response", { id, response });
         } catch (error) {
-          console.error(
+          this.logger.error(
             `[${this.serviceName}] Error handling request for event "${event}" (ID: ${id})`,
             error
           );
@@ -96,7 +104,7 @@ export class MicrostreamClient {
           this.socket.emit("response", { id, error: "Internal server error" });
         }
       } else {
-        console.warn(
+        this.logger.warn(
           `[${this.serviceName}] No handler found for event "${event}" (ID: ${id})`
         );
         // No handler found for the event
@@ -106,7 +114,7 @@ export class MicrostreamClient {
 
     // Handle responses to pending requests
     this.socket.on("response", ({ id, data }) => {
-      console.log(
+      this.logger.debug(
         `[${this.serviceName}] Received response for request ${id}`,
         data
       );
@@ -114,7 +122,7 @@ export class MicrostreamClient {
         this.pendingRequests[id](data);
         delete this.pendingRequests[id];
       } else {
-        console.warn(
+        this.logger.warn(
           `[${this.serviceName}] Received unexpected response for request ${id}`,
           data
         );
@@ -177,15 +185,11 @@ export class MicrostreamClient {
 
   private startHeartbeat() {
     if (this.heartbeatInterval > 0) {
-      console.log(
+      this.logger.info(
         `[${this.serviceName}] Starting heartbeat with interval ${this.heartbeatInterval}ms`
       );
       this.heartbeatTimer = setInterval(() => {
-        /* console.log(
-          `[${
-            this.serviceName
-          }] Sending heartbeat - ${new Date().toLocaleString()}`
-        ); */
+        this.logger.debug(`[${this.serviceName}] Sending heartbeat}`);
         this.socket.emit("heartbeat", { serviceName: this.serviceName });
       }, this.heartbeatInterval);
     }
@@ -193,7 +197,7 @@ export class MicrostreamClient {
 
   private stopHeartbeat() {
     if (this.heartbeatTimer) {
-      console.log(`[${this.serviceName}] Stopping heartbeat`);
+      this.logger.info(`[${this.serviceName}] Stopping heartbeat`);
       clearInterval(this.heartbeatTimer);
     }
   }
