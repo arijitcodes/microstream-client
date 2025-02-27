@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node", // Add this line
+    "target": "ES6",
+    "module": "ESNext", // Use ESNext for ESM
+    "strict": true,
+    "outDir": "dist/esm",
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*"]
+}

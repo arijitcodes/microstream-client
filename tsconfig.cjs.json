@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node", // Add this line
+    "target": "ES6",
+    "module": "CommonJS", // For CJS
+    "strict": true,
+    "outDir": "dist/cjs",
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+  "include": ["src/**/*"]
+}

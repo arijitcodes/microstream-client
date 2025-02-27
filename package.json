@@ -1,0 +1,43 @@
+{
+  "name": "microstream-client",
+  "version": "1.0.0",
+  "description": "A lightweight client SDK for Microstream communication",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "prepare": "npm run build",
+    "test": "jest"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arijitcodes/microstream-client.git"
+  },
+  "author": "Arijit Banerjee <arijit.codes@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "nanoid": "^4.0.0",
+    "socket.io-client": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "jest": "^29.0.0",
+    "typescript": "^5.7.3"
+  }
+}
