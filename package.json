@@ -17,7 +17,7 @@
     "build:esm": "tsc -p tsconfig.esm.json",
     "prepare": "npm run build",
     "packGithubBuild": "rm -rf ./microstream-client.tar.gz && tar -cvzf microstream-client.tar.gz dist CHANGELOG.md README.md LICENSE CONTRIBUTING.md package.json",
-    "release": "npm run build && npm run packGithubBuild && semantic-release",
+    "release": "npm run packGithubBuild && semantic-release",
     "commit": "cz",
     "test": "jest"
   },

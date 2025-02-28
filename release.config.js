@@ -23,6 +23,7 @@ module.exports = {
         changelogFile: "CHANGELOG.md",
       },
     ],
+    "@semantic-release/npm", // Add this for the Client SDK only
     [
       "@semantic-release/github",
       {
@@ -43,6 +44,5 @@ module.exports = {
           "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}",
       },
     ],
-    "@semantic-release/npm", // Add this for the Client SDK only
   ],
 };
