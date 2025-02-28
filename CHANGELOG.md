@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/arijitcodes/microstream-client/compare/v1.0.3...v1.0.4) (2025-02-28)
+
+
+### Bug Fixes
+
+✅ **package.json:** updating postRelease script to inclucke package lock files foe npm and bun ([fde5a32](https://github.com/arijitcodes/microstream-client/commit/fde5a32fadc6a20a12b50b599750df300804c367))
+
 ## [1.0.3](https://github.com/arijitcodes/microstream-client/compare/v1.0.2...v1.0.3) (2025-02-28)
 
 
