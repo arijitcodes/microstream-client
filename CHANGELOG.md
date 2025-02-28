@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/arijitcodes/microstream-client/compare/v1.0.1...v1.0.2) (2025-02-28)
+
+
+### Bug Fixes
+
+✅ **package.json:** trying a fix for Issue [#2](https://github.com/arijitcodes/microstream-client/issues/2) - where Package.json version was not being updated ([54f09af](https://github.com/arijitcodes/microstream-client/commit/54f09af270a816f63e93713d3244c573c2321133))
+
 ## [1.0.1](https://github.com/arijitcodes/microstream-client/compare/v1.0.0...v1.0.1) (2025-02-28)
 
 
