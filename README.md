@@ -1,6 +1,6 @@
 # MicroStream Client SDK
 
-A lightweight client SDK for Microstream communication.
+The client library for Microstream, a lightweight, real-time communication library for microservices. Replace REST/gRPC with WebSockets for event-driven messaging. Simplifies inter-service communication with a request-response pattern and automatic reconnection.
 
 Author: [Arijit Banerjee](#author)  
 License: [MIT](./LICENSE)
