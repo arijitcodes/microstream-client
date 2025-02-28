@@ -1,4 +1,4 @@
-# MicroStream Client SDK
+# MicroStream Client SDK 🚀
 
 The client library for Microstream, a lightweight, real-time communication library for microservices. Replace REST/gRPC with WebSockets for event-driven messaging. Simplifies inter-service communication with a request-response pattern and automatic reconnection.
 
@@ -40,29 +40,34 @@ License: [MIT](./LICENSE)
 
 <hr>
 
-## Table of Contents
+## Table of Contents 📚
 
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration Options](#configuration-options)
-- [Log Levels](#log-levels)
-- [Author](#author)
-- [Contributing](#contributing)
-- [License](#license)
-
-<hr>
-
-## Features
-
-- Real-time inter-service communication using WebSockets.
-- Synchronous request-response pattern without HTTP overhead.
-- Auto-discovery and connection management.
-- Configurable logging for better observability.
+- [Features ✨](#features-✨)
+- [Installation 🛠️](#installation-🛠️)
+- [Usage 🚀](#usage-🚀)
+- [Configuration Options ⚙️](#configuration-options-⚙️)
+- [Log Levels 📊](#log-levels-📊)
+- [MicroStream Hub 🏢](#microstream-hub-🏢)
+- [Author 👨‍💻](#author-👨‍💻)
+- [Contributing 🤝](#contributing-🤝)
+- [License 📜](#license-📜)
 
 <hr>
 
-## Installation
+## Features ✨
+
+- 🔄 Real-time inter-service communication using WebSockets.
+- ⚡ Synchronous request-response pattern without HTTP overhead.
+- 🔍 Auto-discovery and connection management.
+- 📊 Configurable logging for better observability.
+- 🏢 Central WebSocket server for real-time communication between microservices (provided by the hub).
+- 🔗 Service discovery and registration (provided by the hub).
+- 📡 Request routing and response handling (provided by the hub).
+- ❤️ Heartbeat mechanism to detect and remove inactive services (provided by the hub).
+
+<hr>
+
+## Installation 🛠️
 
 ```bash
 npm install microstream-client
@@ -70,31 +75,48 @@ npm install microstream-client
 
 <hr>
 
-## Usage
+## Usage 🚀
 
 ```typescript
 import { MicrostreamClient } from "microstream-client";
 
+// Create a new MicrostreamClient instance with the necessary configuration
 const client = new MicrostreamClient({
-  hubUrl: "http://localhost:3000",
-  serviceName: "auth-service",
+  hubUrl: "http://localhost:3000", // URL of the Microstream Hub
+  serviceName: "auth-service", // Name of your service
   logLevel: "debug", // Enable debug logs
 });
 
+// Register a handler for incoming requests
 client.onRequest("authenticate", (data) => {
   console.log("Received authentication request:", data);
-  return { success: true, token: "sample-token" };
+  return { success: true, token: "sample-token" }; // Respond to the request
 });
 
+// Send a request to another service and handle the response
 const response = await client.sendRequest("jwt-service", "generate_jwt", {
   userId: 123,
 });
 console.log("Received response:", response);
 ```
 
+### Explanation
+
+1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the Microstream Hub, the name of your service, and the log level.
+2. **Registering Handlers**: The `onRequest` method is used to register a handler for incoming requests. In this example, the handler responds to an "authenticate" event.
+   - **Parameters**:
+     - `event`: The event name to listen for.
+     - `handler`: The function to handle the request. It receives the request data and returns the response.
+3. **Sending Requests**: The `sendRequest` method is used to send a request to another service. In this example, a request is sent to the "jwt-service" to generate a JWT for a user with ID 123.
+   - **Parameters**:
+     - `targetService`: The name of the target service.
+     - `event`: The event name to trigger on the target service.
+     - `data`: Optional data to send with the request.
+   - **Returns**: A promise that resolves with the response from the target service.
+
 <hr>
 
-## Configuration Options
+## Configuration Options ⚙️
 
 ### MicrostreamClientOptions
 
@@ -102,11 +124,11 @@ console.log("Received response:", response);
 - `serviceName`: Name of the service connecting to the hub.
 - `timeout`: Timeout for requests in milliseconds (default: 5000).
 - `heartbeatInterval`: Interval for sending heartbeats in milliseconds (default: 5000).
-- `logLevel`: Log level for the client (default: "info").
+- [`logLevel`](#log-levels-): Log level for the client (default: "info").
 
 <hr>
 
-## Log Levels
+## Log Levels 📊
 
 - `debug`: Log everything (useful for development).
 - `info`: Log info, warnings, and errors.
@@ -116,7 +138,16 @@ console.log("Received response:", response);
 
 <hr>
 
-## Author
+## MicroStream Hub 🏢
+
+We also provide a central hub for easy integration with the MicroStream Client SDK.
+
+- [MicroStream Hub on GitHub](https://github.com/arijitcodes/microstream-hub)
+- [MicroStream Hub Documentation](https://github.com/arijitcodes/microstream-hub#readme)
+
+<hr>
+
+## Author 👨‍💻
 
 Author: [Arijit Banerjee](https://www.github.com/arijitcodes)
 
@@ -135,13 +166,13 @@ Email: arijit.codes@gmail.com
 
 <hr>
 
-## Contributing
+## Contributing 🤝
 
 We welcome contributions! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute to this project.
 
 <hr>
 
-## License
+## License 📜
 
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
