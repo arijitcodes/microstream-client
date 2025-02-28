@@ -1,3 +1,12 @@
+## [1.0.3](https://github.com/arijitcodes/microstream-client/compare/v1.0.2...v1.0.3) (2025-02-28)
+
+
+### Bug Fixes
+
+✅ **version:** issue [#2](https://github.com/arijitcodes/microstream-client/issues/2) second attempt ([c3e9b30](https://github.com/arijitcodes/microstream-client/commit/c3e9b30a113a41d67eca29160e7812d0c4623670))  
+
+verison update issue still exists, this is 2nd attempt to fix <br/><br/>
+
 ## [1.0.2](https://github.com/arijitcodes/microstream-client/compare/v1.0.1...v1.0.2) (2025-02-28)
 
 
