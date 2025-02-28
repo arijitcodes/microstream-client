@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/arijitcodes/microstream-client/compare/v1.0.0...v1.0.1) (2025-02-28)
+
+
+### Bug Fixes
+
+✅ **package.json:** added Keywords for package ([c7a0669](https://github.com/arijitcodes/microstream-client/commit/c7a066991f1f6797065207b0d8d73059e4418a05))
+
 # 1.0.0 (2025-02-28)
 
 
