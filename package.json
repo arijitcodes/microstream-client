@@ -18,6 +18,7 @@
     "prepare": "npm run build",
     "packGithubBuild": "rm -rf ./microstream-client.tar.gz && tar -cvzf microstream-client.tar.gz dist CHANGELOG.md README.md LICENSE CONTRIBUTING.md package.json",
     "release": "npm run packGithubBuild && semantic-release",
+    "postrelease": "bun install && npm install",
     "commit": "cz",
     "test": "jest"
   },
