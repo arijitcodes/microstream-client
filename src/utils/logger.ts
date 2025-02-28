@@ -1,3 +1,5 @@
+import chalk from "chalk";
+
 export type LogLevel = "debug" | "info" | "warn" | "error" | "silent";
 
 export default class Logger {
@@ -12,11 +14,34 @@ export default class Logger {
     return levels.indexOf(level) >= levels.indexOf(this.logLevel);
   }
 
-  private formatMessage(level: string, ...args: any[]): string {
-    const timestamp = new Date().toISOString();
-    return `[MicroStream Client][${timestamp}][${level.toUpperCase()}] ${args.join(
-      " "
-    )}`;
+  private formatMessage(level: LogLevel, ...args: any[]): string {
+    if (level === "silent") {
+      return ""; // Skip formatting for "silent" logs
+    }
+
+    const prefix = chalk.magenta(`[MicroStream Client]`);
+    const timestamp = chalk.gray(`[${new Date().toISOString()}]`);
+
+    // Define levelLabel with a default value
+    const levelLabel =
+      {
+        debug: chalk.greenBright,
+        info: chalk.cyan,
+        warn: chalk.yellow,
+        error: chalk.red,
+      }[level] || chalk.white; // Default to white if level is invalid
+
+    const formattedLevel = levelLabel(`[${level.toUpperCase()}]`);
+    const message = args
+      .map((arg) =>
+        arg instanceof Error
+          ? arg.stack
+          : typeof arg === "object"
+          ? JSON.stringify(arg, null, 2)
+          : arg
+      )
+      .join(" ");
+    return `${prefix}${timestamp}${formattedLevel} ${message}`;
   }
 
   debug(...args: any[]) {

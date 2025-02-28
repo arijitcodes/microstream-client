@@ -189,7 +189,7 @@ export class MicrostreamClient {
         `[${this.serviceName}] Starting heartbeat with interval ${this.heartbeatInterval}ms`
       );
       this.heartbeatTimer = setInterval(() => {
-        this.logger.debug(`[${this.serviceName}] Sending heartbeat}`);
+        this.logger.debug(`[${this.serviceName}] Sending heartbeat`);
         this.socket.emit("heartbeat", { serviceName: this.serviceName });
       }, this.heartbeatInterval);
     }
