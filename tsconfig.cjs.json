@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node", // Add this line
+    "moduleResolution": "node",
     "target": "ES6",
     "module": "CommonJS", // For CJS
     "strict": true,
@@ -9,5 +9,5 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["src/**/*", "src/utils/**/*"] // Add this line
+  "include": ["src/**/*"]
 }
