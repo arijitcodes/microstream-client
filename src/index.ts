@@ -1,6 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
 import Logger from "./utils/logger"; // Import the logger
+import { exit } from "process";
 
 /**
  * Options for initializing the MicrostreamClient.
@@ -125,6 +126,38 @@ export class MicrostreamClient {
         this.logger.warn(
           `[${this.serviceName}] Received unexpected response for request ${id}`,
           data
+        );
+      }
+    });
+
+    // Handle socket connection rejection error by the hub
+    this.socket.on("connect_error", (error) => {
+      const customError = error as Error & { data?: any };
+
+      // Check if the error contains additional data
+      if (customError instanceof Error && customError.data) {
+        // If yes, then it's a custom connection error/rejection from the hub
+        this.logger.error(
+          `[${this.serviceName}] Connection error to MicroStream Hub: ${customError.data?.code}:`,
+          customError.data?.content
+        );
+
+        // Special cases for handling specific error codes
+        switch (customError.data?.code) {
+          case "DUPLICATE_SERVICE_REGISTRATION":
+            // Exit the process if a duplicate service registration attempt is detected
+            exit(1);
+            break;
+
+          // Add more cases as needed in the future
+
+          default:
+            // Do something on default or continue as usual
+            break;
+        }
+      } else {
+        this.logger.error(
+          `[${this.serviceName}] Connection error to Microstream Hub: ${customError.message}`
         );
       }
     });
