@@ -139,7 +139,7 @@ const { MicrostreamClient } = require("microstream-client");
 // Create a new MicrostreamClient instance with the necessary configuration
 const client = new MicrostreamClient({
   hubUrl: "http://localhost:3000", // URL of the Microstream Hub
-  serviceName: "auth-service", // Name of your service
+  serviceName: "auth-service", // Name of your service - it has to be unique
   logLevel: "debug", // Enable debug logs
 });
 
@@ -180,7 +180,7 @@ try {
 
 ### Explanation 👨🏻‍🏫
 
-1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the [Microstream Hub](#microstream-hub-), the name of your service, and the log level.
+1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the [Microstream Hub](#microstream-hub-), the unique registration name of your service, and the log level.
 2. **Registering Handlers**: The `onRequest` method is used to register a handler for incoming requests. In this example, handlers respond to "authenticate" and "another-event" events.
    - **Parameters**:
      - `event`: The event name to listen for.
@@ -200,10 +200,18 @@ try {
 ### MicrostreamClientOptions
 
 - `hubUrl`: URL of the Microstream Hub.
-- `serviceName`: Name of the service connecting to the hub.
+- `serviceName`: A Unique Service Registation Name of the service connecting to the hub.
 - `timeout`: Timeout for requests in milliseconds (default: 5000).
 - `heartbeatInterval`: Interval for sending heartbeats in milliseconds (default: 5000).
 - [`logLevel`](#log-levels-): Log level for the client (default: "info").
+
+### Important Notes 📝
+
+- **Service names** must be **unique** across your entire system. The Hub will reject any connection attempts from services trying to register with an already registered name.
+- If your service attempts to connect with a name that's already registered:
+  - The connection will be rejected
+  - An error will be thrown with code `DUPLICATE_SERVICE_REGISTRATION`
+  - The process will automatically terminate to prevent conflicts
 
 <hr>
 
