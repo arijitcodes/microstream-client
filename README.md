@@ -133,8 +133,8 @@ npm install microstream-client
 
 ## Usage 🚀
 
-```typescript
-import { MicrostreamClient } from "microstream-client";
+```javascript
+const { MicrostreamClient } = require("microstream-client");
 
 // Create a new MicrostreamClient instance with the necessary configuration
 const client = new MicrostreamClient({
@@ -143,32 +143,55 @@ const client = new MicrostreamClient({
   logLevel: "debug", // Enable debug logs
 });
 
-// Register a handler for incoming requests
+// Register a handler for incoming requests for event 'authenticate'
 client.onRequest("authenticate", (data) => {
   console.log("Received authentication request:", data);
   return { success: true, token: "sample-token" }; // Respond to the request
 });
 
-// Send a request to another service and handle the response
-const response = await client.sendRequest("jwt-service", "generate_jwt", {
-  userId: 123,
+// Register another handler for incoming request for another event
+client.onRequest("another-event", (data) => {
+  console.log("Received another-event request:", data);
+  return { success: true, data: "sample-data" }; // Respond to the request
 });
-console.log("Received response:", response);
+
+//  Send a request to 'jwt-service' and handle the response
+try {
+  const response = await client.sendRequest("jwt-service", "generate_jwt", {
+    userID: 123,
+  });
+  console.log("Received response:", response);
+} catch (error) {
+  console.log("Error:", error.message);
+}
+
+//  Send a request to 'profile-service' and handle the response
+try {
+  const response = await client.sendRequest(
+    "profile-service",
+    "fetch-profile-by-userID",
+    { userID: 123 }
+  );
+  console.log("Received response:", response);
+} catch (error) {
+  console.log("Error:", error.message);
+}
 ```
 
-### Explanation
+### Explanation 👨🏻‍🏫
 
 1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the [Microstream Hub](#microstream-hub-), the name of your service, and the log level.
-2. **Registering Handlers**: The `onRequest` method is used to register a handler for incoming requests. In this example, the handler responds to an "authenticate" event.
+2. **Registering Handlers**: The `onRequest` method is used to register a handler for incoming requests. In this example, handlers respond to "authenticate" and "another-event" events.
    - **Parameters**:
      - `event`: The event name to listen for.
      - `handler`: The function to handle the request. It receives the request data and returns the response.
-3. **Sending Requests**: The `sendRequest` method is used to send a request to another service. In this example, a request is sent to the "jwt-service" to generate a JWT for a user with ID 123.
+3. **Sending Requests**: The `sendRequest` method is used to send a request to another service. In this example, requests are sent to the "jwt-service" to generate a JWT and to the "profile-service" to fetch a profile by user ID.
    - **Parameters**:
      - `targetService`: The name of the target service.
      - `event`: The event name to trigger on the target service.
      - `data`: Optional data to send with the request.
    - **Returns**: A promise that resolves with the response from the target service.
+   - **Error Handling**: The `sendRequest` method is wrapped in a try-catch block to handle any errors that may occur during the request. For example, if a request is sent to an invalid service, the [Hub](#microstream-hub-) will respond with an error, which will be received by the client and thrown accordingly. The catch block will catch the error, and the user can display it using the `error.message` property.
 
 <hr>
 
