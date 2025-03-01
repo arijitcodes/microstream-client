@@ -1,3 +1,19 @@
+## [1.0.5](https://github.com/arijitcodes/microstream-client/compare/v1.0.4...v1.0.5) (2025-03-01)
+
+
+### Bug Fixes
+
+✅ **index.ts:** Implemented Duplicate Service Regn. Attempt and Hub Connection Rejection Handling ([c9ae873](https://github.com/arijitcodes/microstream-client/commit/c9ae87322600f131d3539207ed3ed7c7c55626da)), closes [#3](https://github.com/arijitcodes/microstream-client/issues/3)  
+
+- Added proper error handling for hub connection rejection
+- Implemented graceful process termination on duplicate detection
+- Enhanced error logging with detailed service context
+- Added connection_error event handler for hub rejection
+- Implemented custom error type handling with error codes
+- Added automatic process exit on DUPLICATE_SERVICE_REGISTRATION error
+
+This ensures proper client-side handling of hub rejections for duplicate services, providing clear error messaging and preventing service conflicts through automatic termination. Works in conjunction with hub-side validation for complete security implementation. <br/><br/>
+
 ## [1.0.4](https://github.com/arijitcodes/microstream-client/compare/v1.0.3...v1.0.4) (2025-02-28)
 
 
