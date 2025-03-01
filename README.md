@@ -42,15 +42,16 @@ License: [MIT](./LICENSE)
 
 ## Table of Contents 📚
 
-- [Features ✨](#features-✨)
-- [Installation 🛠️](#installation-🛠️)
-- [Usage 🚀](#usage-🚀)
-- [Configuration Options ⚙️](#configuration-options-⚙️)
-- [Log Levels 📊](#log-levels-📊)
-- [MicroStream Hub 🏢](#microstream-hub-🏢)
-- [Author 👨‍💻](#author-👨‍💻)
-- [Contributing 🤝](#contributing-🤝)
-- [License 📜](#license-📜)
+- [Features ✨](#features-)
+- [How Does It Work? 🌟](#how-does-it-work-)
+- [Installation 🛠️](#installation-)
+- [Usage 🚀](#usage-)
+- [Configuration Options ⚙️](#configuration-options-)
+- [Log Levels 📊](#log-levels-)
+- [MicroStream Hub 🏢](#microstream-hub-)
+- [Author 👨‍💻](#author-)
+- [Contributing 🤝](#contributing-)
+- [License 📜](#license-)
 
 <hr>
 
@@ -64,6 +65,61 @@ License: [MIT](./LICENSE)
 - 🔗 Service discovery and registration (provided by the hub).
 - 📡 Request routing and response handling (provided by the hub).
 - ❤️ Heartbeat mechanism to detect and remove inactive services (provided by the hub).
+
+<hr>
+
+## How Does It Work? 🌟
+
+**MicroStream** simplifies communication between microservices using a **centralized hub-and-spoke architecture**, also known as a **star network**. In this model, the **[MicroStream Hub](https://github.com/arijitcodes/microstream-hub)** acts as the central communication point, and your microservices, equipped with the **[MicroStream Client](https://github.com/arijitcodes/microstream-client)**, connect to the Hub and communicate through it.
+
+Here's how it works:
+
+### 🌟 The Star Network Concept
+
+Imagine a star:
+
+- The **center of the star** is the **[MicroStream Hub](https://github.com/arijitcodes/microstream-hub)**.
+- The **points of the star** are your **microservices** (each equipped with the **[MicroStream Client](https://github.com/arijitcodes/microstream-client)**).
+
+![MicroStream Star Network Diagram](https://mermaid.ink/svg/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBIdWJbTWljcm9TdHJlYW0gSHViXSAtLT4gU2VydmljZTFbU2VydmljZSAxXVxuICAgIEh1YiAtLT4gU2VydmljZTJbU2VydmljZSAyXVxuICAgIEh1YiAtLT4gU2VydmljZTNbU2VydmljZSAzXVxuICAgIEh1YiAtLT4gU2VydmljZTRbU2VydmljZSA0XVxuICAgIEh1YiAtLT4gU2VydmljZTVbU2VydmljZSA1XVxuIiwibWVybWFpZCI6eyJ0aGVtZSI6ImRlZmF1bHQiLCJsaW5lV2lkdGgiOiIzIn19)
+
+In this setup:
+
+- The **Hub** acts as the central communication point.
+- **Services** (nodes) connect to the Hub and communicate through it, **not directly with each other**.
+
+### 🚀 How It Works in Practice
+
+1. **Service Registration**:
+
+   - Each microservice connects to the Hub using the **[MicroStream Client](https://github.com/arijitcodes/microstream-client)**.
+   - The **[Hub](https://github.com/arijitcodes/microstream-hub)** automatically detects and registers the service.
+
+2. **Request-Response Communication in Real-Time**:
+
+   - When **Service A** needs to talk to **Service B**, it sends a request to the **[Hub](https://github.com/arijitcodes/microstream-hub)**.
+   - The **[Hub](https://github.com/arijitcodes/microstream-hub)** routes the request to **Service B**.
+   - **Service B** processes the request and sends a response back through the **[Hub](https://github.com/arijitcodes/microstream-hub)**.
+   - All communication happens in **real-time** over WebSockets, ensuring fast and reliable data exchange.
+
+3. **Auto-Discovery**:
+
+   - Once connected, the **[Hub](https://github.com/arijitcodes/microstream-hub)** keeps track of all connected services, so you don’t need to manually configure connections between services. However, you still need to specify the target service and method when sending a request.
+
+4. **Heartbeat Mechanism**:
+   - Services send regular "heartbeats" to the **[Hub](https://github.com/arijitcodes/microstream-hub)** to confirm they’re active.
+   - If a service stops sending heartbeats, the **[Hub](https://github.com/arijitcodes/microstream-hub)** removes it from the network.
+
+### ✨ Why Choose MicroStream?
+
+**MicroStream** is designed to make microservice communication **simple**, **efficient**, and **scalable**. Here’s why you’ll love it:
+
+- **Easy Setup**: Minimal configuration required to get started.
+- **Real-Time Request-Response Communication**: Built on WebSockets for instant, reliable data exchange.
+- **Auto-Service-Management**: Once connected, the **[Hub](https://github.com/arijitcodes/microstream-hub)** keeps track of all services, simplifying network management.
+- **Scalable**: Easily add more services without reconfiguring the network.
+- **Lightweight**: Minimal overhead compared to traditional REST or gRPC.
+- **Flexible**: Works seamlessly with any microservice architecture.
 
 <hr>
 
@@ -102,7 +158,7 @@ console.log("Received response:", response);
 
 ### Explanation
 
-1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the Microstream Hub, the name of your service, and the log level.
+1. **Configuration**: The [`MicrostreamClient`](#microstreamclientoptions) is configured with the URL of the [Microstream Hub](#microstream-hub-), the name of your service, and the log level.
 2. **Registering Handlers**: The `onRequest` method is used to register a handler for incoming requests. In this example, the handler responds to an "authenticate" event.
    - **Parameters**:
      - `event`: The event name to listen for.
