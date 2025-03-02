@@ -2,6 +2,7 @@ import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
 import Logger from "./utils/logger"; // Import the logger
 import { exit } from "process";
+import CustomError from "./utils/customError"; // Import the custom error class
 
 /**
  * Options for initializing the MicrostreamClient.
@@ -79,7 +80,7 @@ export class MicrostreamClient {
     });
 
     // Handle incoming requests
-    this.socket.on("request", ({ id, event, data }) => {
+    this.socket.on("request", ({ id, event, data }: RequestPayload) => {
       this.logger.debug(
         `[${this.serviceName}] Received request for event "${event}" (ID: ${id})`,
         data
@@ -102,14 +103,43 @@ export class MicrostreamClient {
             error
           );
           // Handle any errors that occur during handler execution
-          this.socket.emit("response", { id, error: "Internal server error" });
+          // this.socket.emit("response", { id, error: "Internal server error" });
+          // Send a CustomError for internal server errors
+          this.socket.emit("response", {
+            id,
+            response: {
+              error: new CustomError(
+                "INTERNAL_SERVER_ERROR",
+                "Internal server error",
+                {
+                  event,
+                  requestID: id,
+                  error:
+                    error instanceof Error || error instanceof CustomError
+                      ? error.message
+                      : "UNKNOWN",
+                }
+              ),
+            },
+          });
         }
       } else {
         this.logger.warn(
           `[${this.serviceName}] No handler found for event "${event}" (ID: ${id})`
         );
         // No handler found for the event
-        this.socket.emit("response", { id, error: "Event not found" });
+        // this.socket.emit("response", { id, error: "Event not found" });
+        // Send a CustomError for event not found errors
+        this.socket.emit("response", {
+          id,
+          response: {
+            error: new CustomError(
+              "EVENT_NOT_FOUND",
+              `Event "${event}" not found`,
+              { event, requestID: id, serviceName: this.serviceName }
+            ),
+          },
+        });
       }
     });
 
@@ -139,7 +169,7 @@ export class MicrostreamClient {
         // If yes, then it's a custom connection error/rejection from the hub
         this.logger.error(
           `[${this.serviceName}] Connection error to MicroStream Hub: ${customError.data?.code}:`,
-          customError.data?.content
+          customError.data?.message
         );
 
         // Special cases for handling specific error codes
@@ -196,8 +226,13 @@ export class MicrostreamClient {
       const timeoutHandler = setTimeout(() => {
         // reject(new Error("Request timeout"));
         reject(
-          new Error(
+          /* new Error(
             `Request to ${targetService} timed out after ${this.timeout}ms`
+          ) */
+          new CustomError(
+            "REQUEST_TIMEOUT",
+            `Request to ${targetService} timed out after ${this.timeout}ms`,
+            { targetService, event, data }
           )
         );
         delete this.pendingRequests[requestId]; // Clean up
@@ -208,7 +243,7 @@ export class MicrostreamClient {
         clearTimeout(timeoutHandler);
         // resolve(response);
         if (response.error) {
-          reject(new Error(response.error)); // Reject if the response contains an error
+          reject(response.error); // Reject if the response contains an error
         } else {
           resolve(response); // Resolve with the response data
         }

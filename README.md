@@ -48,6 +48,7 @@ License: [MIT](./LICENSE)
 - [Usage 🚀](#usage-)
 - [Configuration Options ⚙️](#configuration-options-)
 - [Log Levels 📊](#log-levels-)
+- [Error Handling 🚨](#error-handling-)
 - [MicroStream Hub 🏢](#microstream-hub-)
 - [Author 👨‍💻](#author-)
 - [Contributing 🤝](#contributing-)
@@ -225,9 +226,94 @@ try {
 
 <hr>
 
+## Error Handling 🚨
+
+**[MicroStream Client](https://github.com/arijitcodes/microstream-client)** implements standardized error handling using a `CustomError` class. All errors follow a consistent structure to help with error management and debugging.
+
+### Error Structure 📋
+
+```typescript
+{
+  code: string;        // Error identification code
+  message: string;     // Human readable error message
+  errorData?: any;     // Optional contextual data
+}
+```
+
+### Standard Error Codes 📝
+
+The **[Client](https://github.com/arijitcodes/microstream-client)** may throw the following error types:
+
+| Error Code                       | Description                                                             |
+| -------------------------------- | ----------------------------------------------------------------------- |
+| `INTERNAL_SERVER_ERROR`          | Occurs when an event handler fails during execution                     |
+| `EVENT_NOT_FOUND`                | Thrown when no handler is registered for the requested event            |
+| `REQUEST_TIMEOUT`                | Occurs when a request exceeds the configured timeout period             |
+| `DUPLICATE_SERVICE_REGISTRATION` | Thrown when attempting to register a service name that's already in use |
+
+### Usage Examples 💡
+
+```javascript
+// Example: Handling request errors
+try {
+  const response = await client.sendRequest("auth-service", "validate-token", {
+    token: "xyz",
+  });
+} catch (error) {
+  switch (error.code) {
+    case "REQUEST_TIMEOUT":
+      console.error(`Request timed out: ${error.message}`);
+      console.log("Request details:", error.errorData);
+      break;
+    case "EVENT_NOT_FOUND":
+      console.error(`Event handler not found: ${error.message}`);
+      break;
+    case "INTERNAL_SERVER_ERROR":
+      console.error(`Service error: ${error.message}`);
+      console.log("Error context:", error.errorData);
+      break;
+  }
+}
+```
+
+### Error Handling Best Practices 🎯
+
+1. Always wrap requests in try-catch blocks
+2. Check error codes for specific error handling
+3. Use error.errorData for additional context in debugging
+4. Handle REQUEST_TIMEOUT errors with appropriate retry logic
+5. Implement proper logging for INTERNAL_SERVER_ERROR cases
+
+### Common Error Scenarios 🔄
+
+1. **Timeout Errors**
+
+   - Occurs when target service doesn't respond within timeout period
+   - Default timeout: 5000ms (configurable via options)
+   - Includes target service and event details in errorData
+
+2. **Event Not Found**
+
+   - Happens when requesting non-existent event handlers
+   - Includes event name and service details in errorData
+   - Check event name and target service configuration
+
+3. **Internal Server Errors**
+
+   - Triggered by exceptions in event handlers
+   - Contains original error details in errorData
+   - Useful for debugging service-side issues
+
+4. **Service Registration Errors**
+   - Occurs during initial connection
+   - Critical errors that may require process termination
+   - Check for duplicate service names in your network
+
+<hr>
+
 ## MicroStream Hub 🏢
 
-We also provide a central hub for easy integration with the MicroStream Client SDK.
+Here is the central hub for easy integration with the MicroStream Client SDK.
 
 - [MicroStream Hub on GitHub](https://github.com/arijitcodes/microstream-hub)
 - [MicroStream Hub Documentation](https://github.com/arijitcodes/microstream-hub#readme)
@@ -264,3 +350,4 @@ We welcome contributions! Please see our [CONTRIBUTING.md](./CONTRIBUTING.md) fo
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 <hr>
+```
