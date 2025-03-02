@@ -1,3 +1,18 @@
+# [1.1.0](https://github.com/arijitcodes/microstream-client/compare/v1.0.5...v1.1.0) (2025-03-02)
+
+
+### Features
+
+✅ implement comprehensive error handling system ([ef8c673](https://github.com/arijitcodes/microstream-client/commit/ef8c67393b5c664ec96756153b2e0467a2a4a3d6))  
+
+- Update error handling to match hub's error structure
+- Add support for parsing standardized error codes
+- Implement error data structure compatibility
+- Add detailed error handling documentation
+- Document error structure and standard error codes
+- Include usage examples and best practices
+- Add common error scenarios and solutions <br/><br/>
+
 ## [1.0.5](https://github.com/arijitcodes/microstream-client/compare/v1.0.4...v1.0.5) (2025-03-01)
 
 
