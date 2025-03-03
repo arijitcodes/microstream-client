@@ -144,18 +144,18 @@ export class MicrostreamClient {
     });
 
     // Handle responses to pending requests
-    this.socket.on("response", ({ id, data }) => {
+    this.socket.on("response", ({ id, response }) => {
       this.logger.debug(
         `[${this.serviceName}] Received response for request ${id}`,
-        data
+        response
       );
       if (this.pendingRequests[id]) {
-        this.pendingRequests[id](data);
+        this.pendingRequests[id](response);
         delete this.pendingRequests[id];
       } else {
         this.logger.warn(
           `[${this.serviceName}] Received unexpected response for request ${id}`,
-          data
+          response
         );
       }
     });
