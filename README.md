@@ -244,12 +244,13 @@ try {
 
 The **[Client](https://github.com/arijitcodes/microstream-client)** may throw the following error types:
 
-| Error Code                       | Description                                                             |
-| -------------------------------- | ----------------------------------------------------------------------- |
-| `INTERNAL_SERVER_ERROR`          | Occurs when an event handler fails during execution                     |
-| `EVENT_NOT_FOUND`                | Thrown when no handler is registered for the requested event            |
-| `REQUEST_TIMEOUT`                | Occurs when a request exceeds the configured timeout period             |
-| `DUPLICATE_SERVICE_REGISTRATION` | Thrown when attempting to register a service name that's already in use |
+| Error Code                       | Description                                                                              |
+| -------------------------------- | ---------------------------------------------------------------------------------------- |
+| `INTERNAL_SERVER_ERROR`          | Occurs when an event handler fails during execution                                      |
+| `EVENT_NOT_FOUND`                | Thrown when no handler is registered for the requested event                             |
+| `REQUEST_TIMEOUT`                | Occurs when a request exceeds the configured timeout period                              |
+| `DUPLICATE_SERVICE_REGISTRATION` | Thrown when attempting to register a service name that's already in use                  |
+| `TARGET_SERVICE_NOT_FOUND`       | Thrown when attempting to send a request to a service that isn't registered with the hub |
 
 ### Usage Examples 💡
 
