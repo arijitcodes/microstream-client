@@ -1,3 +1,21 @@
+# [1.2.0](https://github.com/arijitcodes/microstream-client/compare/v1.1.0...v1.2.0) (2025-03-18)
+
+
+### Features
+
+✅ **index.ts:** added late response handling with onLateResponse callback ([a7eab29](https://github.com/arijitcodes/microstream-client/commit/a7eab2990c147e692c7215a6ac92477ff1605923))  
+
+- Introduced `allowLateResponseAfterTimeout` flag in `sendRequest` method to enable late response handling.
+- Added `onLateResponse` callback in `sendRequest` method to handle late responses after request timeout.
+- Modified `sendRequest` to store timed-out requests conditionally in `timedOutRequests` object.
+- Updated response handler to invoke `onLateResponse` for late responses.
+- Improved error handling by passing `CustomError` or response to the callback.
+- Added detailed logging for late response handling.
+- Updated README with documentation for late response handling and new error codes.
+- Updated `auth-service` example to demonstrate late response handling in the README.
+
+This feature allows users to handle late responses gracefully, providing better flexibility for real-time communication in microservices. <br/><br/>
+
 # [1.1.0](https://github.com/arijitcodes/microstream-client/compare/v1.0.5...v1.1.0) (2025-03-02)
 
 
