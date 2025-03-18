@@ -66,6 +66,7 @@ License: [MIT](./LICENSE)
 - 🔗 Service discovery and registration (provided by the hub).
 - 📡 Request routing and response handling (provided by the hub).
 - ❤️ Heartbeat mechanism to detect and remove inactive services (provided by the hub).
+- ⏳ Late response handling even after a request timeout.
 
 <hr>
 
@@ -108,8 +109,13 @@ In this setup:
    - Once connected, the **[Hub](https://github.com/arijitcodes/microstream-hub)** keeps track of all connected services, so you don’t need to manually configure connections between services. However, you still need to specify the target service and method when sending a request.
 
 4. **Heartbeat Mechanism**:
+
    - Services send regular "heartbeats" to the **[Hub](https://github.com/arijitcodes/microstream-hub)** to confirm they’re active.
    - If a service stops sending heartbeats, the **[Hub](https://github.com/arijitcodes/microstream-hub)** removes it from the network.
+
+5. **Late Response Handling**:
+   - If a request times out, you can optionally allow late responses to be handled via a callback.
+   - This is useful for scenarios where the target service may respond after the timeout period - and the request is for something that can be done in the background or processed later.
 
 ### ✨ Why Choose MicroStream?
 
@@ -121,6 +127,7 @@ In this setup:
 - **Scalable**: Easily add more services without reconfiguring the network.
 - **Lightweight**: Minimal overhead compared to traditional REST or gRPC.
 - **Flexible**: Works seamlessly with any microservice architecture.
+- **Late Response Handling**: Gracefully handle responses that arrive after a timeout.
 
 <hr>
 
@@ -177,6 +184,26 @@ try {
 } catch (error) {
   console.log("Error:", error.message);
 }
+
+// Example of late response handling
+try {
+  const response = await client.sendRequest(
+    "jwt-service",
+    "generate_jwt",
+    { userId: 123 },
+    true, // Allow late responses
+    (error, res) => {
+      if (error) {
+        console.log("Late response error:", error.message);
+      } else {
+        console.log("Late response received:", res);
+      }
+    }
+  );
+  console.log("Received response:", response);
+} catch (error) {
+  console.log("Error:", error.message);
+}
 ```
 
 ### Explanation 👨🏻‍🏫
@@ -187,12 +214,20 @@ try {
      - `event`: The event name to listen for.
      - `handler`: The function to handle the request. It receives the request data and returns the response.
 3. **Sending Requests**: The `sendRequest` method is used to send a request to another service. In this example, requests are sent to the "jwt-service" to generate a JWT and to the "profile-service" to fetch a profile by user ID.
-   - **Parameters**:
-     - `targetService`: The name of the target service.
-     - `event`: The event name to trigger on the target service.
-     - `data`: Optional data to send with the request.
-   - **Returns**: A promise that resolves with the response from the target service.
-   - **Error Handling**: The `sendRequest` method is wrapped in a try-catch block to handle any errors that may occur during the request. For example, if a request is sent to an invalid service, the [Hub](#microstream-hub-) will respond with an error, which will be received by the client and thrown accordingly. The catch block will catch the error, and the user can display it using the `error.message` property.
+
+- **Parameters**:
+
+  - `targetService`: The name of the target service.
+  - `event`: The event name to trigger on the target service.
+  - `data`: Optional data to send with the request.
+  - `allowLateResponseAfterTimeout`: Whether to allow handling late responses after the request times out (default: `false`).
+  - `onLateResponse`: Optional callback to handle late responses. This callback is invoked if:
+    - `allowLateResponseAfterTimeout` is true, and
+    - A late response is received after the request has timed out.
+
+- **Returns**: A promise that resolves with the response from the target service.
+
+- **Error Handling**: The `sendRequest` method is wrapped in a try-catch block to handle any errors that may occur during the request. For example, if a request is sent to an invalid service, the [**Hub**](#microstream-hub-) will respond with an error, which will be received by the client and thrown accordingly. The catch block will catch the error, and the user can display it using the `error.message` property. For more error related info, please have a look at the [Error Structure](#error-structure-) or the [Error Handling Section](#error-handling-)
 
 <hr>
 
@@ -279,11 +314,12 @@ try {
 
 ### Error Handling Best Practices 🎯
 
-1. Always wrap requests in try-catch blocks
+1. Always wrap requests in `try-catch` blocks
 2. Check error codes for specific error handling
-3. Use error.errorData for additional context in debugging
-4. Handle REQUEST_TIMEOUT errors with appropriate retry logic
-5. Implement proper logging for INTERNAL_SERVER_ERROR cases
+3. Use `error.errorData` for additional context in debugging
+4. Handle `REQUEST_TIMEOUT` errors with appropriate retry logic
+5. Implement proper logging for `INTERNAL_SERVER_ERROR` cases
+6. Use `allowLateResponseAfterTimeout` and `onLateResponse` to handle late responses gracefully
 
 ### Common Error Scenarios 🔄
 
@@ -306,9 +342,16 @@ try {
    - Useful for debugging service-side issues
 
 4. **Service Registration Errors**
+
    - Occurs during initial connection
    - Critical errors that may require process termination
    - Check for duplicate service names in your network
+
+5. **Late Response Errors**
+
+   - Occurs when a response is received after the request has timed out
+   - Includes the original request payload and response data
+   - Use `onLateResponse` to handle these scenarios gracefully
 
 <hr>
 

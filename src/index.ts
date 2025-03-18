@@ -44,6 +44,19 @@ export class MicrostreamClient {
   private handlers: { [event: string]: (data: any) => any } = {};
   private pendingRequests: { [requestId: string]: (response: any) => void } =
     {};
+  private timedOutRequests: {
+    [requestId: string]: {
+      allowLateResponseAfterTimeout: boolean;
+      onLateResponse?: (
+        error: CustomError | null,
+        response: {
+          response: any;
+          originalPayload: RequestPayload;
+        } | null
+      ) => void;
+      originalPayload: RequestPayload; // In case we use it in future
+    };
+  } = {};
   private logger: Logger; // Add logger instance
 
   /**
@@ -149,10 +162,66 @@ export class MicrostreamClient {
         `[${this.serviceName}] Received response for request ${id}`,
         response
       );
+
+      /*
       if (this.pendingRequests[id]) {
         this.pendingRequests[id](response);
         delete this.pendingRequests[id];
       } else {
+        this.logger.warn(
+          `[${this.serviceName}] Received unexpected response for request ${id}`,
+          response
+        );
+      }
+      */
+
+      // First check if the request is a Normal Pending Request
+      if (this.pendingRequests[id]) {
+        this.pendingRequests[id](response);
+        delete this.pendingRequests[id];
+        return;
+      }
+
+      // Else - Check if the request is in timedOutRequests
+      const timedOutRequest = this.timedOutRequests[id];
+
+      if (timedOutRequest) {
+        this.logger.warn(
+          `Received response for timed-out request ${id}`,
+          response
+        );
+
+        // Check if late responses are allowed
+        if (timedOutRequest.allowLateResponseAfterTimeout) {
+          // Invoke the onLateResponse callback if it exists
+          this.logger.info(
+            `Invoking onLateResponse callback for timed-out request ${id}`
+          );
+
+          if (timedOutRequest.onLateResponse) {
+            // If the response contains an error, pass it as the first argument
+            if (response.error) {
+              timedOutRequest.onLateResponse(
+                response.error, // Error object
+                null // No response
+              );
+            } else {
+              // If the response is successful, pass null as the first argument and the response as the second argument
+              timedOutRequest.onLateResponse(
+                null, // No error
+                {
+                  response,
+                  originalPayload: timedOutRequest.originalPayload,
+                }
+              );
+            }
+          }
+        }
+
+        // Clean up the timed-out request
+        delete this.timedOutRequests[id];
+      } else {
+        // Completely unexpected response
         this.logger.warn(
           `[${this.serviceName}] Received unexpected response for request ${id}`,
           response
@@ -205,15 +274,35 @@ export class MicrostreamClient {
 
   /**
    * Sends a request to another service through the Microstream Hub.
+   *
    * @param targetService - The name of the target service.
    * @param event - The event name to trigger on the target service.
    * @param data - Optional data to send with the request.
+   * @param allowLateResponseAfterTimeout - Whether to allow handling late responses after the request times out.
+   *                                         If `true`, the `onLateResponse` callback will be invoked if a late response is received.
+   *                                         Defaults to `false`.
+   * @param onLateResponse - Optional callback to handle late responses. This callback is invoked if:
+   *                         1. `allowLateResponseAfterTimeout` is `true`, and
+   *                         2. A late response is received after the request has timed out.
+   *                         The callback receives two arguments:
+   *                         - `error`: A `CustomError` object if the late response contains an error, or `null` if the response is successful.
+   *                         - `response`: An object containing the `response` and `originalPayload` if the response is successful, or `null` if there’s an error.
    * @returns A promise that resolves with the response from the target service.
+   *          If the request times out, the promise is rejected with a `CustomError`. For specific error codes, refer to the documentation.
+   *          If a late response is received and `allowLateResponseAfterTimeout` is `true`, the `onLateResponse` callback is invoked.
    */
   public sendRequest(
     targetService: string,
     event: string,
-    data?: any
+    data?: any,
+    allowLateResponseAfterTimeout: boolean = false,
+    onLateResponse?: (
+      error: CustomError | null,
+      response: {
+        response: any;
+        originalPayload: RequestPayload;
+      } | null
+    ) => void
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       const requestId = nanoid();
@@ -224,6 +313,15 @@ export class MicrostreamClient {
 
       // Set a timeout for the request
       const timeoutHandler = setTimeout(() => {
+        // Only add the timed out request to timedOutRequests object/map if late responses are allowed
+        if (allowLateResponseAfterTimeout) {
+          this.timedOutRequests[requestId] = {
+            allowLateResponseAfterTimeout,
+            onLateResponse,
+            originalPayload: payload,
+          };
+        }
+
         // reject(new Error("Request timeout"));
         reject(
           /* new Error(
@@ -235,6 +333,8 @@ export class MicrostreamClient {
             { targetService, event, data }
           )
         );
+
+        // Delete from PendingRequests
         delete this.pendingRequests[requestId]; // Clean up
       }, this.timeout);
 
